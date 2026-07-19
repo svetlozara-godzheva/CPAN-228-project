@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
+
 <body>
 <nav th:replace="~{fragment/navbar :: navbar}"></nav>
 <div class="container">
@@ -14,10 +16,121 @@
         <div class="col">
             <h2>Courses</h2>
         </div>
+        <div class="col-auto">
+            <a th:href="@{/courses/create}" class="btn btn-primary">Create course</a>
+        </div>
     </div>
     <hr/>
+
+    <div class="card border-0 shadow-sm p-4 mb-4 bg-light">
+        <form method="get" action="/courses" class="row g-3 align-items-end">
+            <input type="hidden" name="size" th:value="${pageSize}"/>
+
+            <div class="col-md-4">
+                <label for="search" class="form-label fw-bold text-muted small">Search Term</label>
+                <input type="text" id="search" name="search" th:value="${search}" class="form-control"
+                       placeholder="Enter course name...">
+            </div>
+
+            <div class="col-md-2">
+                <label for="filterType" class="form-label fw-bold text-muted small">Filter By</label>
+                <select id="filterType" name="filterType" class="form-select">
+                    <option value="all" th:selected="${filterType == 'all'}">All Courses</option>
+                    <option value="name" th:selected="${filterType == 'name'}">By Name</option>
+                    <option value="code" th:selected="${filterType == 'code'}">By Code</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label for="sort" class="form-label fw-bold text-muted small">Sort By</label>
+                <select id="sort" name="sort" class="form-select">
+                    <option value="name" th:selected="${sort == 'name'}">By Name</option>
+                    <option value="startDate" th:selected="${sort == 'startDate'}">By Start Date</option>
+                </select>
+            </div>
+
+            <div class="col-md-1">
+                <label for="direction" class="form-label fw-bold text-muted small">Direction</label>
+                <select id="direction" name="direction" class="form-select">
+                    <option value="ASC" th:selected="${direction == 'ASC'}">ASC</option>
+                    <option value="DESC" th:selected="${direction == 'DESC'}">DESC</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-success fw-bold flex-grow-1">Search</button>
+                <a href="/courses" class="btn btn-outline-secondary fw-bold flex-grow-1">Reset</a>
+            </div>
+        </form>
+    </div>
+    <div th:if="${courses.isEmpty()}" class="alert alert-info">
+        No courses available.
+    </div>
+
+    <div>
+        <div class="list-group mb-3">
+            <a th:each="course : ${courses}" th:href="@{/courses/{id}(id=${course.id})}"
+               class="list-group-item list-group-item-action">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="mb-1">
+                            <span class="text-muted" th:text="${course.code}">CPAN-228</span>
+                            <span th:text="${course.name}">Course name</span>
+                        </h5>
+                        <p class="mb-0 text-muted small" th:text="${course.description}">Course description</p>
+                    </div>
+                    <span class="text-muted small text-nowrap ms-3"
+                          th:text="${course.startDate != null ? #temporals.format(course.startDate, 'yyyy.MM.dd') : ''}">2026.01.12</span>
+                </div>
+            </a>
+        </div>
+
+        <div th:if="${totalPages > 0}"
+             class="d-flex flex-column flex-sm-row justify-content-center align-items-center mt-2 mb-5 gap-3">
+            <!-- Navigation Buttons -->
+            <nav aria-label="Course pagination">
+                <ul class="pagination pagination-sm mb-0">
+                    <!-- First Page -->
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/courses(page=0, size=${pageSize}, sort=${sort}, direction=${direction}, search=${search}, filterType=${filterType})}">First</a>
+                    </li>
+
+                    <!-- Previous Page -->
+                    <li class="page-item" th:classappend="${!hasPrevious} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/courses(page=${currentPage - 1}, size=${pageSize}, sort=${sort}, direction=${direction}, search=${search}, filterType=${filterType})}">Previous</a>
+                    </li>
+
+                    <!-- Page Numbers -->
+                    <th:block th:if="${totalPages > 0}">
+                        <li class="page-item" th:each="p : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${p == currentPage} ? 'active'"
+                            th:if="${p >= currentPage - 2 && p <= currentPage + 2}">
+                            <a class="page-link"
+                               th:href="@{/courses(page=${p}, size=${pageSize}, sort=${sort}, direction=${direction}, search=${search}, filterType=${filterType})}"
+                               th:text="${p + 1}">1</a>
+                        </li>
+                    </th:block>
+
+                    <!-- Next Page -->
+                    <li class="page-item" th:classappend="${!hasNext} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/courses(page=${currentPage + 1}, size=${pageSize}, sort=${sort}, direction=${direction}, search=${search}, filterType=${filterType})}">Next</a>
+                    </li>
+
+                    <!-- Last Page -->
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/courses(page=${totalPages - 1}, size=${pageSize}, sort=${sort}, direction=${direction}, search=${search}, filterType=${filterType})}">Last</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
