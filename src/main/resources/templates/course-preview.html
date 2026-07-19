@@ -30,10 +30,10 @@
         <dd class="col-sm-9" th:text="${course.code}">Course Code</dd>
 
         <dt class="col-sm-3">Name</dt>
-        <dd class="col-sm-9" th:text="${course.name}">Course name</dd>
+        <dd class="col-sm-9" th:text="${course.name}">Course Name</dd>
 
         <dt class="col-sm-3">Description</dt>
-        <dd class="col-sm-9" th:text="${course.description}">Course description</dd>
+        <dd class="col-sm-9" th:text="${course.description}">Course Description</dd>
 
         <dt class="col-sm-3">Start date</dt>
         <dd class="col-sm-9"
@@ -41,12 +41,30 @@
             Start Date
         </dd>
 
-        <dt class="col-sm-3">End date</dt>
+        <dt class="col-sm-3">End Date</dt>
         <dd class="col-sm-9"
             th:text="${course.endDate != null ? #temporals.format(course.endDate, 'yyyy.MM.dd HH:mm') : '-'}">
             End Date
         </dd>
     </dl>
+
+    <h4 class="mt-4">Assignments</h4>
+    <div th:if="${course.assignments == null || course.assignments.isEmpty()}" class="alert alert-info">
+        No assignments yet.
+    </div>
+    <div class="list-group mb-3">
+        <a th:each="assignment : ${course.assignments}" th:href="@{/assignments/{id}(id=${assignment.id})}"
+           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <span th:text="${assignment.name}">Assignment Name</span>
+            <span class="text-muted small text-nowrap ms-3"
+                  th:text="${assignment.dueDate != null ? 'Due: ' + #temporals.format(assignment.dueDate, 'yyyy.MM.dd HH:mm') : ''}">
+                Due: yyyy.MM.dd HH:mm
+            </span>
+        </a>
+    </div>
+    <div class="d-flex justify-content-end">
+        <a th:href="@{/assignments/create(courseId=${course.id})}" class="btn btn-primary">Create Assignment</a>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
