@@ -1,0 +1,16 @@
+body {
+    background-color: #f4f6f9;
+}
+
+.navbar {
+    background-color: #559cc9;
+}
+
+.nav-link {
+    color: #fff !important;
+}
+
+.nav-link.active {
+    color: #FFD700 !important;
+    font-weight: bold;
+}

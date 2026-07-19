@@ -1,0 +1,14 @@
+package com.example.eduplatform.controllers;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class CoursesController {
+
+    @GetMapping("/courses")
+    public String displayCourses(Model model) {
+        return "courses";
+    }
+}
